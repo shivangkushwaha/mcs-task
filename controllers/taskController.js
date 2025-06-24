@@ -26,9 +26,9 @@ exports.getTasks = async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit)
       .exec();
-    res.json(tasks);
+    return res.json(tasks);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -51,7 +51,7 @@ exports.updateTask = async (req, res) => {
 
     res.json(task);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -65,8 +65,8 @@ exports.deleteTask = async (req, res) => {
     }
 
     await task.remove();
-    res.json({ message: 'Task deleted' });
+    return res.json({ message: 'Task deleted' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };
