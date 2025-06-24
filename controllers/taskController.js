@@ -9,9 +9,9 @@ exports.createTask = async (req, res) => {
       title, description, status, createdBy: req.userId, assignedTo
     });
     await task.save();
-    res.status(201).json(task);
+    return res.status(201).json({ success : true ,message: 'Task created successfully', responseData : {task} });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ success : false ,message: 'Server error', responseData : {} });
   }
 };
 
@@ -26,9 +26,15 @@ exports.getTasks = async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit)
       .exec();
-    return res.json(tasks);
+      let responseData = {
+        currentpage : parseInt(page),
+        totalpages : Math.ceil((await Task.countDocuments(filter)) / limit),
+        limit : parseInt(limit),
+        tasks
+      }
+    return res.status(200).json({ success : true ,message: 'Tasks fetched successfully', responseData });
   } catch (error) {
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ success : false ,message: 'Server error', responseData : {} });
   }
 };
 
@@ -40,7 +46,7 @@ exports.updateTask = async (req, res) => {
   try {
     const task = await Task.findById(id);
     if (!task || (task.createdBy.toString() !== req.userId && task.assignedTo.toString() !== req.userId)) {
-      return res.status(403).json({ message: 'Not authorized' });
+      return res.status(403).json({ success : false ,message: 'Not authorized', responseData : {} });  
     }
 
     task.title = title || task.title;
@@ -48,10 +54,10 @@ exports.updateTask = async (req, res) => {
     task.status = status || task.status;
     task.assignedTo = assignedTo || task.assignedTo;
     await task.save();
+    return res.status(201).json({ success : true ,message: 'Task updated successfully', responseData : {task} });
 
-    res.json(task);
   } catch (error) {
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ success : false ,message: 'Server error', responseData : {} });
   }
 };
 
@@ -61,12 +67,12 @@ exports.deleteTask = async (req, res) => {
   try {
     const task = await Task.findById(id);
     if (!task || task.createdBy.toString() !== req.userId) {
-      return res.status(403).json({ message: 'Not authorized' });
+      return res.status(403).json({ success : false ,message: 'Not authorized', responseData : {} });  
     }
-
     await task.remove();
-    return res.json({ message: 'Task deleted' });
+    return res.status(200).json({ success : true ,message: "Task deleted successfully", responseData : {task} });
+
   } catch (error) {
-    return res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ success : false ,message: 'Server error', responseData : {} });
   }
 };
