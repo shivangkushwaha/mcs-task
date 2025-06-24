@@ -40,39 +40,41 @@ exports.getTasks = async (req, res) => {
 
 // Update task
 exports.updateTask = async (req, res) => {
-  const { id } = req.params;
-  const { title, description, status, assignedTo } = req.body;
+  const { id, title, description, status, assignedTo } = req.body;
 
   try {
     const task = await Task.findById(id);
-    if (!task || (task.createdBy.toString() !== req.userId && task.assignedTo.toString() !== req.userId)) {
+    if (!task || (task?.createdBy.toString() !== req.userId && task?.assignedTo.toString() !== req.userId)) {
       return res.status(403).json({ success : false ,message: 'Not authorized', responseData : {} });  
     }
 
-    task.title = title || task.title;
-    task.description = description || task.description;
-    task.status = status || task.status;
-    task.assignedTo = assignedTo || task.assignedTo;
+    task.title = title || task?.title;
+    task.description = description || task?.description;
+    task.status = status || task?.status;
+    task.assignedTo = assignedTo || task?.assignedTo;
     await task.save();
     return res.status(201).json({ success : true ,message: 'Task updated successfully', responseData : {task} });
 
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ success : false ,message: 'Server error', responseData : {} });
   }
 };
 
 // Delete task
 exports.deleteTask = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.query;
   try {
     const task = await Task.findById(id);
+    if(!task) return res.status(400).json({ success : false ,message: 'Task not found', responseData : {} });
     if (!task || task.createdBy.toString() !== req.userId) {
       return res.status(403).json({ success : false ,message: 'Not authorized', responseData : {} });  
     }
-    await task.remove();
-    return res.status(200).json({ success : true ,message: "Task deleted successfully", responseData : {task} });
+    let result = await Task.findByIdAndDelete(id);
+    return res.status(200).json({ success : true ,message: "Task deleted successfully", responseData : {task : result} });
 
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ success : false ,message: 'Server error', responseData : {} });
   }
 };

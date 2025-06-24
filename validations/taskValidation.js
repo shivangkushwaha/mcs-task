@@ -8,6 +8,7 @@ const taskCreateValidation = Joi.object({
 });
 
 const taskUpdateValidation = Joi.object({
+  id: Joi.string().length(24).hex().required(),
   title: Joi.string().min(3).max(100).optional(),
   description: Joi.string().min(10).optional(),
   status: Joi.string().valid('pending', 'in-progress', 'done').optional(),

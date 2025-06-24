@@ -7,7 +7,7 @@ const { taskCreateValidation, taskUpdateValidation, taskIdParamValidation } = re
 
 router.post('/tasks', authMiddleware, validate(taskCreateValidation), createTask);
 router.get('/tasks', authMiddleware, getTasks);
-router.put('/tasks/:id', authMiddleware, validate(taskIdParamValidation), validate(taskUpdateValidation), updateTask);
-router.delete('/tasks/:id', authMiddleware, validate(taskIdParamValidation), deleteTask);
+router.put('/tasks', authMiddleware,  validate(taskUpdateValidation), updateTask);
+router.delete('/tasks', authMiddleware, validate(taskIdParamValidation), deleteTask);
 
 module.exports = router;
